@@ -24,7 +24,9 @@ create or replace function colpivot(
         n_clsc_cols integer;
         n_class_cols integer;
     begin
-        in_table := quote_ident('__' || out_table || '_in');
+        in_table := ('__' || out_table || '_in');
+        -- if the temp table already exists, drop
+        execute ( 'drop TABLE IF EXISTS ' || in_table );
         execute ('create temp table ' || in_table || ' on commit drop as ' || in_query);
         -- get ordered unique columns (column combinations)
         query := 'select array[';
@@ -114,9 +116,9 @@ create or replace function colpivot(
             query := query || 'left join ' || in_table || ' as ' || ali || ' on ' || on_e || ' ';
         end loop;
         -- raise notice '%', query;
-        execute ('create temp table ' || quote_ident(out_table) || ' on commit drop as ' || query);
+        execute ('create temp table ' || out_table || ' as ' || query);
         -- cleanup temporary in_table before we return
-        execute ('drop table ' || in_table)
+        execute ('drop table ' || in_table);
         return;
     end;
 $$ language plpgsql volatile;
