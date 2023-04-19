@@ -116,7 +116,7 @@ create or replace function colpivot(
             query := query || 'left join ' || in_table || ' as ' || ali || ' on ' || on_e || ' ';
         end loop;
         -- raise notice '%', query;
-        execute ('create temp table ' || out_table || ' as ' || query);
+        execute ('create table ' || out_table || ' as ' || query);
         -- cleanup temporary in_table before we return
         execute ('drop table ' || in_table);
         return;
